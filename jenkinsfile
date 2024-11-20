@@ -1,0 +1,27 @@
+node
+{
+	stage("cont_download")
+    {
+	git branch: 'main', url: 'https://github.com/nocturnaldevops/Project1.git'
+	}
+	stage("cont_build")
+	{
+	sh 'mvn package'
+	}
+	stage("cont_deploy_to_test")
+	{
+	deploy adapters: [tomcat9(credentialsId: '8d43ff57-0e8c-48ad-992f-9dcea00a76b2', path: '', url: 'http://172.31.17.24:8080')], contextPath: 'test1', war: '**/*.war'
+	}
+	stage("cont_test")
+	{
+	mail bcc: '', body: '''Dear test team 
+please test the application deployed on to test server on this url
+http://51.21.129.170:8080/test1''', cc: '', from: '', replyTo: '', subject: 'test the application', to: 'projects2488@gmail.com'
+	}
+	stage("cont_delivery")
+	{
+	deploy adapters: [tomcat9(credentialsId: '2e5ff550-6386-46d4-af5b-76b61cd803d2', path: '', url: 'http://172.31.21.51:8080')], contextPath: 'rel1', war: '**/*.war'
+	mail bcc: '', body: '''The appliccation is live on 
+http://13.48.138.170:8080/rel1''', cc: '', from: '', replyTo: '', subject: 'application is LIVE', to: 'projects2488@gmail.com'
+	}
+}
